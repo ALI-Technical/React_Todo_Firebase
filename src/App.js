@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import logo from './logo.svg';
 import './App.css';
 
@@ -20,6 +21,18 @@ function App() {
       </header>
     </div>
   );
+=======
+import './App.css';
+import Routing from './config/Routing';
+
+function App() {
+  
+  return (
+    <>
+      <Routing />
+    </>
+  )
+>>>>>>> Stashed changes
 }
 
 export default App;
