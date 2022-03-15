@@ -8,6 +8,7 @@
     border-bottom-right-radius: 50px;
     color: #fff;
     margin-bottom: 2em;
+    text-align: center;
 }
 .sidebar{
     /* border: 5px solid red; */
@@ -20,6 +21,7 @@
     display: flex;
     justify-content: space-between;
     flex-direction: column;
+    width: 20em;
 }
 .sideBox .sideBar-list{
     display: flex;

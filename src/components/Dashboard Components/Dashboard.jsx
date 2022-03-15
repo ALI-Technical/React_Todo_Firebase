@@ -37,7 +37,7 @@ const Dashboard = () => {
             <Link className='sideBar-Btn' to="/dashboard/profile">Profile</Link>
           </Col>
           <Col className='sideBar-list'>
-            <Link className='sideBar-Btn' to='/dashboard/todo'>Todo</Link>
+            <Link className='sideBar-Btn' to='/todo'>Todo</Link>
           </Col>
           <Col className='sideBar-list'>
             <Link className='sideBar-Btn' to='/dashboard/logout'>Products</Link>
