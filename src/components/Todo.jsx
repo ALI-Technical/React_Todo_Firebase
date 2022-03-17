@@ -9,15 +9,18 @@ import { FaTrashAlt, FaEdit } from 'react-icons/fa';
 const Todo = () => {
   const [inputValue, setInputValue] = useState("");
   const [todos, setTodos] = useState([]);
+  const [indexValue, setIndexValue] = useState("");
+  const [editInputValue, setEditInputValue] = useState("");
+  const [todoUpdate, setTodoUpdate] = useState(false);
 
   // Getting Data
   useEffect(async () => {
     try {
       const dbref = collection(db, "todos");
-      
+
       let getTodo = [];
       onSnapshot(dbref, (snapShot) => {
-        const getData = snapShot.forEach( (docs) => {
+        const getData = snapShot.forEach((docs) => {
           getTodo.push({
             key: docs.id,
             todo: docs.data().todo
@@ -29,7 +32,7 @@ const Todo = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [inputValue])
+  }, [todoUpdate, inputValue])
 
 
   // Adding Data
@@ -58,20 +61,35 @@ const Todo = () => {
   };
 
   const editTodo = async (key) => {
-    const editValue = prompt("enter value");
-    const dbRef = doc(db, "todos", key);
-    const updateData = await updateDoc(dbRef, {
-      todo: editValue,
-    });
+    setIndexValue(key);
   };
 
+  // Update Todo
+
+  const updateValue = async (key) => {
+    console.log(editInputValue);
+    // todos.splice(indexValue, 1, editInputValue);
+    // setTodos([...todos]);
+    setIndexValue("");
+    setEditInputValue("");
+    
+    const data = editInputValue;
+    const dbRef = doc(db,"todos",key)
+    await updateDoc(dbRef , {
+      todo : data
+    })
+    setTodoUpdate(!todoUpdate);
+  };
+
+  // Delete Todo
   const deleteTodo = async (key) => {
     const dbRef = doc(db, "todos", key);
-    const delTodo = await deleteDoc(dbRef);
+    await deleteDoc(dbRef);
+    setTodoUpdate(!todoUpdate);
   };
   return (
-    <div className="mainBox container">
-      <div className="title">
+    <div className="mainBox container-fluid">
+      <div className="title container">
         <h1>Awesome Todo</h1>
       </div>
       <div className="row">
@@ -100,20 +118,36 @@ const Todo = () => {
           <div className="main-todo-input-wrap">
             <div className="main-todo-input fl-wrap todo-listing">
               {todos.map((val, ind) => {
-                return (
+                return ind === indexValue ? (
                   <div key={ind} className="card myCard border-info mb-3">
                     <div className="card-header bg-transparent border-info">
                       <h5 className="card-title">Todo: {ind + 1}</h5>
                     </div>
-                    <div className="card-body text-info">
+                    <div className="card-body editBox">
+                      <textarea
+                        placeholder="Edit Value"
+                        value={editInputValue}
+                        className="input-group"
+                        onChange={(e) => setEditInputValue(e.target.value)}
+                      />
+                    </div>
+                    <div className="card-footer bg-transparent border-info">
+                      <button onClick={() => updateValue(val.key)}>Update</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div key={ind} className="card myCard border-info mb-3">
+                    <div className="card-header bg-transparent border-info">
+                      <h5 className="card-title">Todo: {ind + 1}</h5>
+                    </div>
+                    <div className="card-body">
                       <p className="card-text">{val.todo}</p>
                     </div>
                     <div className="card-footer bg-transparent border-info">
-                      <button onClick={() => editTodo(val.key)}><FaEdit /></button>
-                      <button onClick={() => deleteTodo(val.key)}><FaTrashAlt /></button>
+                      <button onClick={() => editTodo(ind)}><FaEdit size={30} /></button>
+                      <button onClick={() => deleteTodo(val.key)}><FaTrashAlt size={30} /></button>
                     </div>
-                  </div>
-                )
+                  </div>)
               })}
             </div>
           </div>

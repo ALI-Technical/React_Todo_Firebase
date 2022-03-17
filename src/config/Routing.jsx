@@ -36,7 +36,7 @@ const Routing = () => {
   return (
     <>
       <Routes>
-        <Route path='/signup' element={<Signup />} />
+        <Route path='/' element={<Signup />} />
         <Route path='/todo' element={<Todo />} />
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='*' element={<Page404 />} />

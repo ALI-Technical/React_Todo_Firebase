@@ -11,7 +11,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate('/signup');
+      navigate('/');
     }
   }, [logout]);
 
@@ -36,7 +36,7 @@ const Profile = () => {
       <Link className='sideBar-Btn' to='/todo'>Todo</Link>
     </Col>
     <Col className='sideBar-list'>
-      <Link className='sideBar-Btn' to='/dashboard/logout'>Products</Link>
+      <span className='sideBar-Btn'>Products</span>
     </Col>
     <Col className='sideBar-list logoutBox'>
       <button className='btn btn-primary' onClick={signOut}>
