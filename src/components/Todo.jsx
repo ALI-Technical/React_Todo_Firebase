@@ -7,11 +7,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FaTrashAlt, FaEdit } from 'react-icons/fa';
 
 const Todo = () => {
+  // Variables
+  const currentUserUid = localStorage.getItem("currentUser");
+
+  // States
+
   const [inputValue, setInputValue] = useState("");
   const [todos, setTodos] = useState([]);
   const [indexValue, setIndexValue] = useState("");
   const [editInputValue, setEditInputValue] = useState("");
   const [todoUpdate, setTodoUpdate] = useState(false);
+  const [isPrivatePost, setIsPrivatePost] = useState(false);
 
   // Getting Data
   useEffect(async () => {
@@ -23,7 +29,9 @@ const Todo = () => {
         const getData = snapShot.forEach((docs) => {
           getTodo.push({
             key: docs.id,
-            todo: docs.data().todo
+            todo: docs.data().todo,
+            userId: docs.data().uId,
+            private: docs.data().privatePost,
           })
         });
         // console.log(getTodo);
@@ -42,6 +50,8 @@ const Todo = () => {
         const dbref = collection(db, "todos")
         const addData = await addDoc(dbref, {
           todo: inputValue,
+          uId: currentUserUid,
+          privatePost: isPrivatePost,
         });
         setInputValue("");
       } catch (error) {
@@ -72,11 +82,11 @@ const Todo = () => {
     // setTodos([...todos]);
     setIndexValue("");
     setEditInputValue("");
-    
+
     const data = editInputValue;
-    const dbRef = doc(db,"todos",key)
-    await updateDoc(dbRef , {
-      todo : data
+    const dbRef = doc(db, "todos", key)
+    await updateDoc(dbRef, {
+      todo: data
     })
     setTodoUpdate(!todoUpdate);
   };
@@ -87,6 +97,14 @@ const Todo = () => {
     await deleteDoc(dbRef);
     setTodoUpdate(!todoUpdate);
   };
+
+  // PrivatePost Function
+
+  const setPrivateValue = (checkbox) => {
+    console.log(checkbox.checked);
+    setIsPrivatePost(checkbox.checked);
+  };
+
   return (
     <div className="mainBox container-fluid">
       <div className="title container">
@@ -104,7 +122,13 @@ const Todo = () => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                 />
-              </div>
+                <input
+                  type="checkbox"
+                  className="btn-check"
+                  id="btncheck1"
+                  onClick={(e) => setPrivateValue(e.target)}
+                  autoComplete="off" />
+                <label className="checkBoxInput btn btn-outline-primary" htmlFor="btncheck1">Private</label>              </div>
               <button
                 onClick={addTodo}
                 className="add-items main-search-button"
@@ -118,36 +142,73 @@ const Todo = () => {
           <div className="main-todo-input-wrap">
             <div className="main-todo-input fl-wrap todo-listing">
               {todos.map((val, ind) => {
-                return ind === indexValue ? (
-                  <div key={ind} className="card myCard border-info mb-3">
-                    <div className="card-header bg-transparent border-info">
-                      <h5 className="card-title">Todo: {ind + 1}</h5>
-                    </div>
-                    <div className="card-body editBox">
-                      <textarea
-                        placeholder="Edit Value"
-                        value={editInputValue}
-                        className="input-group"
-                        onChange={(e) => setEditInputValue(e.target.value)}
-                      />
-                    </div>
-                    <div className="card-footer bg-transparent border-info">
-                      <button onClick={() => updateValue(val.key)}>Update</button>
-                    </div>
-                  </div>
+                return val.private ? (
+                  val.userId === currentUserUid ? (
+
+                    ind === indexValue ? (
+                      <div key={ind} className="card myCard border-info mb-3">
+                        <div className="card-header bg-transparent border-info">
+                          <h5 className="card-title">Todo: {ind + 1}</h5>
+                        </div>
+                        <div className="card-body editBox">
+                          <textarea
+                            placeholder="Edit Value"
+                            value={editInputValue}
+                            className="input-group"
+                            onChange={(e) => setEditInputValue(e.target.value)}
+                          />
+                        </div>
+                        <div className="card-footer bg-transparent border-info">
+                          <button onClick={() => updateValue(val.key)}>Update</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div key={ind} className="card myCard border-info mb-3">
+                        <div className="card-header bg-transparent border-info">
+                          <h5 className="card-title">Todo: {ind + 1}</h5>
+                        </div>
+                        <div className="card-body">
+                          <p className="card-text">{val.todo}</p>
+                        </div>
+                        <div className="card-footer bg-transparent border-info">
+                          <button onClick={() => editTodo(ind)}><FaEdit size={30} /></button>
+                          <button onClick={() => deleteTodo(val.key)}><FaTrashAlt size={30} /></button>
+                        </div>
+                      </div>)
+                  ) : null
                 ) : (
-                  <div key={ind} className="card myCard border-info mb-3">
-                    <div className="card-header bg-transparent border-info">
-                      <h5 className="card-title">Todo: {ind + 1}</h5>
+
+                  ind === indexValue ? (
+                    <div key={ind} className="card myCard border-info mb-3">
+                      <div className="card-header bg-transparent border-info">
+                        <h5 className="card-title">Todo: {ind + 1}</h5>
+                      </div>
+                      <div className="card-body editBox">
+                        <textarea
+                          placeholder="Edit Value"
+                          value={editInputValue}
+                          className="input-group"
+                          onChange={(e) => setEditInputValue(e.target.value)}
+                        />
+                      </div>
+                      <div className="card-footer bg-transparent border-info">
+                        <button onClick={() => updateValue(val.key)}>Update</button>
+                      </div>
                     </div>
-                    <div className="card-body">
-                      <p className="card-text">{val.todo}</p>
-                    </div>
-                    <div className="card-footer bg-transparent border-info">
-                      <button onClick={() => editTodo(ind)}><FaEdit size={30} /></button>
-                      <button onClick={() => deleteTodo(val.key)}><FaTrashAlt size={30} /></button>
-                    </div>
-                  </div>)
+                  ) : (
+                    <div key={ind} className="card myCard border-info mb-3">
+                      <div className="card-header bg-transparent border-info">
+                        <h5 className="card-title">Todo: {ind + 1}</h5>
+                      </div>
+                      <div className="card-body">
+                        <p className="card-text">{val.todo}</p>
+                      </div>
+                      <div className="card-footer bg-transparent border-info">
+                        <button onClick={() => editTodo(ind)}><FaEdit size={30} /></button>
+                        <button onClick={() => deleteTodo(val.key)}><FaTrashAlt size={30} /></button>
+                      </div>
+                    </div>)
+                );
               })}
             </div>
           </div>
